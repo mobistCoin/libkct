@@ -7,10 +7,11 @@ const util = require("util");
  * @returns {string}
  */
 module.exports.createPW = function createCode(iLength) {
-    let arr = "0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,~,!,@,#,%,^,&,*".split(",");
+    let arr = ("0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M," +
+        "N,O,P,Q,R,S,T,U,V,W,X,Y,Z,~,!,@,#,%,^,&,*").split(",");
     let randomStr = "";
-    for (let j=0; j<iLength; j++) {
-        randomStr += arr[Math.floor(Math.random()*arr.length)];
+    for (let j = 0; j < iLength; j++) {
+        randomStr += arr[Math.floor(Math.random() * arr.length)];
     }
     return randomStr
 }
@@ -21,7 +22,8 @@ module.exports.createPW = function createCode(iLength) {
  * @returns {string}
  */
 module.exports.createID = function createID(iLength) {
-    let arr = "0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z".split(",");
+    let arr = ("0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M," +
+        "N,O,P,Q,R,S,T,U,V,W,X,Y,Z").split(",");
     let randomStr = "MITX";
     let size = iLength - randomStr.length;
     for (let j = 0; j < size; j++) {
@@ -40,46 +42,47 @@ module.exports.createID = function createID(iLength) {
  * @param eoa 조회하고자 하는 토큰 거래용 주소
  * @returns {Promise<AxiosResponse<any>>} 비동기 함수의 리턴값으로 값이 저장되는 것을 기다렸다가 사용해야한다.
  */
-module.exports.historyEoa = async function RestHistoryEOAFunction(chainId, accessKeyId, secretAccessKey, contract, eoa) {
-    // https://th-api.klaytnapi.com/v2/transfer/account/{address}
-    let url = "https://th-api.klaytnapi.com/v2/transfer/account/"
-    let request = url.concat(eoa)
+module.exports.historyEoa =
+    async function RestHistoryEOAFunction(chainId, accessKeyId, secretAccessKey, contract, eoa) {
+        // https://th-api.klaytnapi.com/v2/transfer/account/{address}
+        let url = "https://th-api.klaytnapi.com/v2/transfer/account/"
+        let request = url.concat(eoa)
 
-    /**
-     * header에 설정되어야 하는 값을 입력함.
-     * x-chain-id 값은 1001로 설정되어 klaytn의 baobab 테스트 네트워크를 사용하도록 변경한다.
-     */
-    const headers = {
-        'Content-Type': 'application/json',
-        'x-chain-id': chainId
-    }
-    /**
-     * 인증 내역은 username과 password를 사용하여 API의 인증을 진행한다.
-     * username은 accessKeyId를 사용하여 설정하고
-     * password는 secretAccessKey를 사용하여 설정한다.
-     * 이 값을 POST 혹은 GET 하면서 전송하도록 한다.
-     */
-    const auth = {
-        username: accessKeyId,
-        password: secretAccessKey
-    }
+        /**
+         * header에 설정되어야 하는 값을 입력함.
+         * x-chain-id 값은 1001로 설정되어 klaytn의 baobab 테스트 네트워크를 사용하도록 변경한다.
+         */
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-chain-id': chainId
+        }
+        /**
+         * 인증 내역은 username과 password를 사용하여 API의 인증을 진행한다.
+         * username은 accessKeyId를 사용하여 설정하고
+         * password는 secretAccessKey를 사용하여 설정한다.
+         * 이 값을 POST 혹은 GET 하면서 전송하도록 한다.
+         */
+        const auth = {
+            username: accessKeyId,
+            password: secretAccessKey
+        }
 
-    const param = {
-        'kind': "ft",
-        'ca-filter': contract
-    }
+        const param = {
+            'kind': "ft",
+            'ca-filter': contract
+        }
 
-    /**
-     * axios를 사용하여 실제 get으로 명령을 실행하는 부분이다.
-     */
-    return await axios.get(request, {auth: auth, headers: headers, params: param})
-        .then(response => {
-            return response.data
-        })
-        .catch(error => {
-            console.log(error);
-        });
-}
+        /**
+         * axios를 사용하여 실제 get으로 명령을 실행하는 부분이다.
+         */
+        return await axios.get(request, {auth: auth, headers: headers, params: param})
+            .then(response => {
+                return response.data
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
 
 /**
  * FT smart contract 거래 내역을 eoa를 기준으로 확인할 수 있는 함수이다.
@@ -178,6 +181,98 @@ module.exports.balanceFT = async function RestBalanceFunction(chainId, accessKey
 }
 
 /**
+ * 수수료 대납용 계정 생성 함수
+ * @param chainId
+ * @param accessKeyId
+ * @param secretAccessKey
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+module.exports.feePayerCreate = async function (chainId, accessKeyId, secretAccessKey) {
+    const request = "http://wallet-api.klaytnapi.com/v2/feepayer"
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'x-chain-id': chainId
+    }
+
+    const auth = {
+        username: accessKeyId,
+        password: secretAccessKey
+    }
+
+    return await axios.post(request, "",{auth: auth, headers: headers})
+        .then(response => {
+            return response.data;
+        })
+        .catch(error => {
+            console.log(error);
+        });
+}
+
+/**
+ * 클레이튼 API의 실행용 bytecode를 작성하는 함수.
+ * @param address
+ * @param amount
+ * @returns {string}
+ */
+function transferByteInput(address, amount) {
+    const funcName = "0xa9059cbb"
+    let toAddr = address.substr(2).padStart(64, '0')
+    let toAmount = amount.padStart(64, '0')
+
+    return funcName + toAddr + toAmount
+}
+
+/**
+ * 수수료 대납용 API 함수
+ * @param chainId
+ * @param accessKeyId
+ * @param secretAccessKey
+ * @param contract
+ * @param from
+ * @param to
+ * @param amount
+ * @param feePayer
+ * @param memo
+ * @returns {Promise<AxiosResponse<any>>}
+ * @constructor
+ */
+module.exports.TransferFTfee =
+    async function (chainId, accessKeyId, secretAccessKey, contract, from, to, amount, feePayer) {
+        var request = "http://wallet-api.klaytnapi.com/v2/tx/fd-user/contract/execute"
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-chain-id': chainId
+        }
+        const auth = {
+            username: accessKeyId,
+            password: secretAccessKey
+        }
+
+        const byteInput = transferByteInput(to, amount.substr(2))
+
+        const body = {
+            "from": from,
+            "to": contract,
+            "input": byteInput,
+            "feePayer": feePayer,
+            "submit": true
+        }
+
+        console.log(body)
+        console.log({auth: auth, headers: headers})
+
+        return await axios.post(request, body, {auth: auth, headers: headers})
+            .then(response => {
+                return response.data
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+/**
  * Token 전송용 함수이다. 이 함수는 개선이 필요한다.
  * @param chainId
  * @param accessKeyId
@@ -189,52 +284,53 @@ module.exports.balanceFT = async function RestBalanceFunction(chainId, accessKey
  * @returns {Promise<AxiosResponse<any>>}
  * @constructor
  */
-module.exports.TransferFT = async function RestTransferFunction(chainId, accessKeyId, secretAccessKey, contract, from, to, amount) {
-    var url = "https://kip7-api.klaytnapi.com/v1/contract/"
-    var request = url.concat(contract, "/transfer")
+module.exports.TransferFT =
+    async function RestTransferFunction(chainId, accessKeyId, secretAccessKey, contract, from, to, amount) {
+        var url = "https://kip7-api.klaytnapi.com/v1/contract/"
+        var request = url.concat(contract, "/transfer")
 
-    /**
-     * header에 설정되어야 하는 값을 입력함.
-     * x-chain-id 값은 1001로 설정되어 klaytn의 baobab 테스트 네트워크를 사용하도록 변경한다.
-     */
-    const headers = {
-        'Content-Type': 'application/json',
-        'x-chain-id': chainId
-    }
-    /**
-     * 인증 내역은 username과 password를 사용하여 API의 인증을 진행한다.
-     * username은 accessKeyId를 사용하여 설정하고
-     * password는 secretAccessKey를 사용하여 설정한다.
-     * 이 값을 POST 혹은 GET 하면서 전송하도록 한다.
-     */
-    const auth = {
-        username: accessKeyId,
-        password: secretAccessKey
-    }
-    /**
-     * body 내용에는 from과 to, amount 필드를 포함하고 있으며
-     * 이 필드의 값으로 전송량과 계좌간 전송이 이루어진다.
-     * from 토큰을 전송하려는 계좌
-     * to 토큰을 전송받는 계좌
-     * amount 전송되는 토큰량
-     */
-    const body = {
-        "from": from,
-        "to": to,
-        "amount": amount
-    }
+        /**
+         * header에 설정되어야 하는 값을 입력함.
+         * x-chain-id 값은 1001로 설정되어 klaytn의 baobab 테스트 네트워크를 사용하도록 변경한다.
+         */
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-chain-id': chainId
+        }
+        /**
+         * 인증 내역은 username과 password를 사용하여 API의 인증을 진행한다.
+         * username은 accessKeyId를 사용하여 설정하고
+         * password는 secretAccessKey를 사용하여 설정한다.
+         * 이 값을 POST 혹은 GET 하면서 전송하도록 한다.
+         */
+        const auth = {
+            username: accessKeyId,
+            password: secretAccessKey
+        }
+        /**
+         * body 내용에는 from과 to, amount 필드를 포함하고 있으며
+         * 이 필드의 값으로 전송량과 계좌간 전송이 이루어진다.
+         * from 토큰을 전송하려는 계좌
+         * to 토큰을 전송받는 계좌
+         * amount 전송되는 토큰량
+         */
+        const body = {
+            "from": from,
+            "to": to,
+            "amount": amount
+        }
 
-    /**
-     * axios를 사용하여 실제 post로 명령을 실행하는 부분이다.
-     */
-    return await axios.post(request, body, {auth: auth, headers: headers})
-        .then(response => {
-            return response.data
-        })
-        .catch(error => {
-            console.log(error);
-        });
-}
+        /**
+         * axios를 사용하여 실제 post로 명령을 실행하는 부분이다.
+         */
+        return await axios.post(request, body, {auth: auth, headers: headers})
+            .then(response => {
+                return response.data
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
 
 module.exports.AccountCreate = async function RestAccountCreateFunction(chainId, accessKeyId, secretAccessKey) {
     let url = "http://wallet-api.klaytnapi.com/v2/account";
@@ -260,7 +356,7 @@ module.exports.AccountCreate = async function RestAccountCreateFunction(chainId,
     /**
      * axios를 사용하여 실제 post로 명령을 실행하는 부분이다.
      */
-    return await axios.post(url, "",{auth: auth, headers: headers})
+    return await axios.post(url, "", {auth: auth, headers: headers})
         .then(response => {
             return response.data
         })
@@ -396,4 +492,3 @@ module.exports.TxHashInfo = async function WebTxHash(TxHash) {
     console.log(util.format("return exist: %s", result))
 
 }
-

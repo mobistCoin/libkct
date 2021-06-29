@@ -1,11 +1,15 @@
 {
   "name": "libkct",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "description": "Library for KCT API",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "util": "^0.12.4"
+  }
 }
