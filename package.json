@@ -1,6 +1,6 @@
 {
   "name": "libkct",
-  "version": "0.5.2",
+  "version": "0.5.4",
   "description": "Library for KCT API",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",
+    "dateformat": "^4.5.1",
     "util": "^0.12.4"
   }
 }

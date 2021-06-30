@@ -1,5 +1,6 @@
 const axios = require('axios');
 const util = require("util");
+const dateFormat = require('dateformat')
 
 /**
  * 아이디에 대한 비밀번호 문자열을 만들기 위한 함수이다.
@@ -491,4 +492,75 @@ module.exports.TxHashInfo = async function WebTxHash(TxHash) {
 
     console.log(util.format("return exist: %s", result))
 
+}
+
+/**
+ * SVC ID로 로그인하려는 정보를 확인하는 함수
+ * @param connection
+ * @param svc_id
+ * @returns {[string, string]}
+ * @constructor
+ */
+module.exports.GetSVC = function (connection, svc_id) {
+    let accesskey = ""
+    let secretaccesskey = ""
+
+    sql = 'SELECT * FROM svc where pid=' + svc_id
+
+    connection.query(sql, function (error, results, fields) {
+        if (error) {
+            console.log(error);
+        }
+        accesskey = results[0].accesskey;
+        secretaccesskey = results[0].secretaccesskey;
+        dbValue = [accesskey, secretaccesskey]
+    });
+
+    console.log([accesskey, secretaccesskey])
+    return [accesskey, secretaccesskey]
+}
+
+/**
+ * SVC 를 생성하는 함수
+ * @param res
+ * @param connection
+ * @param id
+ * @param pw
+ * @constructor
+ */
+module.exports.SetSVC = function (res, connection, id, pw) {
+    const today=dateFormat(new Date(), "yyyymmdd")
+
+    const sql = 'SELECT count(*) as rowCount FROM svc where pid like "' + today + '%"'
+
+    connection.query(sql, function (error, results, fields) {
+        if (error) {
+            console.log(error)
+        }
+        let result = new Object()
+
+        result.id = id
+        result.password = pw
+
+        num = results[0].rowCount
+
+        if(num >= 0 && num < 99) {
+            num = num + 1
+            const today=dateFormat(new Date(), "yyyymmdd")
+            let pid = today.concat(num.toString().padStart(2, '0'))
+
+            const sql = 'INSERT INTO svc VALUES("' + pid + '", "' + id + '", "' + pw + '")'
+
+            connection.query(sql, function (error, results, fields) {
+                if (error) {
+                    console.log(error);
+                }
+            });
+            return res.send(result)
+        } else {
+            return res.send('{"status": "Overrun"}')
+        }
+
+        return 0
+    });
 }
