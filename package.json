@@ -1,6 +1,6 @@
 {
   "name": "libkct",
-  "version": "0.5.9",
+  "version": "0.5.10",
   "description": "Library for KCT API",
   "main": "index.js",
   "scripts": {
