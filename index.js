@@ -41,9 +41,10 @@ module.exports.createID = function createID(iLength) {
 }
 
 /**
- * mainnet / testnet 구분하여 public api 용 hostname 반환용 함수
- * @param {number} chainId  mainnet: 8217, testnet: 1001
- * @returns {string} API 접근용 hostname
+ * network ID 체크하여 메인넷, 테스트넷에 해당하는 hostname 을 반환하는 함수
+ * Public API 사용을 위해 적용되는 함수.
+ * @param {number} chainId 처리하려는 네트워크 ID (mainnet: 8217, testnet: 1001)
+ * @return {string} 접속해야하는 public API hostname
  */
 function getHostUrl(chainId) {
     let url
@@ -278,15 +279,15 @@ module.exports.feePayerCreate =
 
 /**
  * 수수료 대납용 API 함수
- * @param chainId
- * @param accessKeyId
- * @param secretAccessKey
- * @param contract
- * @param from
- * @param to
- * @param amount
- * @param feePayer
- * @returns {Promise<AxiosResponse<any>>}
+ * @param {number} chainId 처리하려는 네트워크 ID (mainnet: 8217, testnet: 1001)
+ * @param {string} accessKeyId
+ * @param {string} secretAccessKeyPw
+ * @param {string} contract
+ * @param {string} from
+ * @param {string} to
+ * @param {number} amount
+ * @param {string} feePayer
+ * @return {Promise<AxiosResponse<any>>}
  * @constructor
  */
 module.exports.TransferFTfee =
@@ -523,14 +524,16 @@ module.exports.AccountInfo =
 
 /**
  * WebAPI를 사용하여 지갑의 Transaction 기록을 가져올 수 있는 함수
- * @param address
- * @returns {Promise<AxiosResponse<any>>}
+ * @param {number} chainId 처리하려는 네트워크 ID (mainnet: 8217, testnet: 1001)
+ * @param {string} address 대상 지갑의 주소
+ * @param {number} page 리스트의 해당 페이지. 페이지당 25건이 출력됨.
+ * @return {Promise<AxiosResponse<any>>}
  * @constructor
  */
 module.exports.AccountTxs =
-    async function (chainId, address) {
+    async function (chainId, address, page= 1) {
         let url = getHostUrl(chainId)
-        const request = url.concat('v1/accounts/', address, "/txs")
+        const request = url.concat('v1/accounts/', address, "/txs?limit=25&page=", page)
 
         return axios.get(request)
             .then(response => {
@@ -549,9 +552,9 @@ module.exports.AccountTxs =
  * @constructor
  */
 module.exports.AccountTransfers =
-    function (chainId, eoa) {
+    function (chainId, eoa, page=1) {
         let url = getHostUrl(chainId)
-        const request = url.concat('v1/accounts/', eoa, "/transfers?limit=100")
+        const request = url.concat('v1/accounts/', eoa, "/transfers?limit=25&page=", page)
 
         return axios.get(request)
             .then(response => {
@@ -585,14 +588,16 @@ module.exports.ContractHolders =
 
 /**
  * Smart Contract 거래 기록들을 확인
- * @param contract
- * @returns {Promise<AxiosResponse<any>>}
+ * @param {number} chainId 처리하려는 네트워크 ID (mainnet: 8217, testnet: 1001)
+ * @param {string} contract
+ * @param {number} page
+ * @return {Promise<AxiosResponse<any>>}
  * @constructor
  */
 module.exports.ContractTransfers =
-    async function (chainId, contract) {
+    async function (chainId, contract, page = 1) {
         let url = getHostUrl(chainId)
-        const request = url.concat('v1/tokens/', contract, "/transfers?limit=1000")
+        const request = url.concat('v1/tokens/', contract, "/transfers?limit=25&page=", page)
 
         return axios.get(request)
             .then(response => {
@@ -604,9 +609,10 @@ module.exports.ContractTransfers =
     }
 
 /**
- * Token을 가지고 있는 지갑들의 리스트를 가져오는 함수
+ * Token 을 가지고 있는 지갑들의 리스트를 가져오는 함수
+ * @param {number} chainId 처리하려는 네트워크 ID (mainnet: 8217, testnet: 1001)
  * @param address
- * @returns {Promise<AxiosResponse<any>>}
+ * @return {Promise<AxiosResponse<any>>}
  * @constructor
  */
 module.exports.TokenBalance =
